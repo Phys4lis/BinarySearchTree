@@ -5,6 +5,8 @@
 using namespace std;
 
 void add(Node* &treeRoot, Node* current, Node* newNode);
+void print(Node* treeRoot, int level);
+void remove(Node* &treeRoot, Node* current, int value);
 int correctInput();
 
 int main() {
@@ -12,7 +14,7 @@ int main() {
   Node* treeRoot = NULL;
   Node* current;
   Node* newNode;
-  
+  int level = 0;
   
   bool looping = true;
   while (looping == true) {
@@ -51,11 +53,15 @@ int main() {
     }
     // Print tree
     else if (option == 2) {
-      
+      print(treeRoot, level);
     }
     // Delete nodes from tree
     else if (option == 3) {
-     
+      cout << "What number would you like to delete?" << endl;
+      int value;
+      cin >> value;
+      cin.get();
+      remove(treeRoot, treeRoot, value);
     }
     // Quit the program
     else if (option == 4) {
@@ -66,21 +72,64 @@ int main() {
 
 // Add needs much more work...think about what cases could occur
 void add(Node* &treeRoot, Node* current, Node* newNode) {
-  bool parentGreater = false;
-  if (current->getNum() > newNode->getNum()) {
-    parentGreater = true;
-  }
   if (treeRoot == NULL) {
     treeRoot = newNode;
   }
-  else if ((parentGreater == true) && (current->getLeft() == NULL)) {
-    current->setLeft(newNode);
+  else if (current->getNum() > newNode->getNum()) {
+    if (current->getLeft() == NULL) {
+      current->setLeft(newNode);
+    }
+    else if (current->getLeft() != NULL) {
+      add(treeRoot, current->getLeft(), newNode);
+    }
   }
-  else if ((parentGreater == true) && (current->getLeft() != NULL) && (current->getRight() == NULL)) {
-    current->setRight(newNode);
+  else if ((current->getNum() < newNode->getNum()) || (current->getNum() == newNode->getNum())) {
+    if (current->getRight() == NULL) {
+      current->setRight(newNode);
+    }
+    else if (current->getRight() != NULL) {
+      add(treeRoot, current->getRight(), newNode);
+    }
+  }
+}
+
+void print(Node* treeRoot, int level) {
+  if (treeRoot == NULL) {
+    cout << "The tree is empty!" << endl;
+  }
+  // Go through the right side of tree, finding where the tree stops, and indenting appropriately
+  else {
+    if (treeRoot->getRight() != NULL) {
+      print(treeRoot->getRight(), level + 1);
+    }
+    // Indent values
+    for (int i = 0; i < level; i++) {
+      cout << '\t';
+    }
+    // Left side
+    cout << treeRoot->getNum() << endl;
+    if (treeRoot->getLeft() != NULL) {
+      print(treeRoot->getLeft(), level + 1);
+    }
+  }
+}
+
+void remove(Node* &treeRoot, Node* current, int value) {
+  if (treeRoot == NULL) {
+    cout << "The tree is empty!" << endl;
   }
   else {
-    add(treeRoot, current->getLeft(), newNode);
+    if (current == value) {
+      // Check cases!!!!!
+    }
+    else {
+      if (current->getRight() != NULL) {
+	remove(treeRoot, current->getRight(), value);
+      }
+      else if (current->getLeft() != NULL) {
+	remove(treeRoot, current->getLeft(), value);
+      }
+    }
   }
 }
 
