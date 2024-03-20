@@ -6,7 +6,8 @@ using namespace std;
 
 void add(Node* &treeRoot, Node* current, Node* newNode);
 void print(Node* treeRoot, int level);
-void remove(Node* &treeRoot, Node* current, int value);
+void search(Node* treeRoot, int value, bool &contained);
+void remove(Node* &treeRoot, Node* current, Node* parent, int direction, int value);
 int correctInput();
 
 int main() {
@@ -55,22 +56,37 @@ int main() {
     else if (option == 2) {
       print(treeRoot, level);
     }
-    // Delete nodes from tree
+    // Search for values
     else if (option == 3) {
+      cout << "What number would you like to search for?" << endl;
+      int value;
+      cin >> value;
+      cin.get();
+      bool contained = false;
+      search(treeRoot, value, contained);
+      if (contained == true) {
+	cout << endl << "The inputted value is contained within the tree." << endl << endl;
+      }
+      else if (contained == false) {
+	cout << endl << "The inputted value is NOT contained within the tree." << endl << endl;
+      }
+    }
+    // Delete nodes from tree
+    else if (option == 4) {
       cout << "What number would you like to delete?" << endl;
       int value;
       cin >> value;
       cin.get();
-      remove(treeRoot, treeRoot, value);
+      int direction;
+      remove(treeRoot, treeRoot, treeRoot, direction, value);
     }
     // Quit the program
-    else if (option == 4) {
+    else if (option == 5) {
       looping = false;
     }
   }
 }
 
-// Add needs much more work...think about what cases could occur
 void add(Node* &treeRoot, Node* current, Node* newNode) {
   if (treeRoot == NULL) {
     treeRoot = newNode;
@@ -95,7 +111,7 @@ void add(Node* &treeRoot, Node* current, Node* newNode) {
 
 void print(Node* treeRoot, int level) {
   if (treeRoot == NULL) {
-    cout << "The tree is empty!" << endl;
+    cout << "The tree is empty!" << endl << endl;
   }
   // Go through the right side of tree, finding where the tree stops, and indenting appropriately
   else {
@@ -114,20 +130,72 @@ void print(Node* treeRoot, int level) {
   }
 }
 
-void remove(Node* &treeRoot, Node* current, int value) {
+void search(Node* treeRoot, int value, bool &contained) {
   if (treeRoot == NULL) {
-    cout << "The tree is empty!" << endl;
+    cout << "The tree is empty!" << endl << endl;
   }
   else {
-    if (current == value) {
-      // Check cases!!!!!
+    if (treeRoot->getNum() == value) {
+      contained = true;
+    }
+    if (treeRoot->getRight() != NULL) {
+      search(treeRoot->getRight(), value, contained);
+    }
+    if (treeRoot->getLeft() != NULL) {
+      search(treeRoot->getLeft(), value, contained);
+    }
+  }
+}
+
+void remove(Node* &treeRoot, Node* current, Node* parent, int direction, int value) {
+  if (treeRoot == NULL) {
+    cout << "The tree is empty!" << endl << endl;
+    return;
+  }
+  else {
+    if (current->getNum() == value) {
+      // Case where node has no children
+      if (current->getRight() == NULL && current->getLeft() == NULL) {	
+	if (current == treeRoot) {
+	  treeRoot = NULL;
+	}
+	else {
+	  if (direction == 1) {
+	    parent->setRight(NULL);
+	  }
+	  else if (direction == 0) {
+	    parent->setLeft(NULL);
+	  }
+	  current = NULL;
+	}
+      }
+      // Case where node has two children
+      else if (current->getRight() != NULL && current->getLeft() != NULL) {
+	
+      }
+      // Case where node has one child
+      else if (current->getRight() != NULL || current->getLeft() != NULL) {
+	
+      }
     }
     else {
-      if (current->getRight() != NULL) {
-	remove(treeRoot, current->getRight(), value);
+      if (current->getNum() < value) {
+	if (current->getRight() != NULL) {
+	  direction = 1;
+	  remove(treeRoot, current->getRight(), current, direction, value);
+	}
+	else {
+	  cout << endl << "This number is not contained within the tree!" << endl << endl;
+	}
       }
-      else if (current->getLeft() != NULL) {
-	remove(treeRoot, current->getLeft(), value);
+      else if (current->getNum() > value) {
+	if (current->getLeft() != NULL) {
+	  direction = 0;
+	  remove(treeRoot, current->getLeft(), current, direction, value);
+	}
+	else {
+	  cout << endl << "This number is not contained within the tree" << endl << endl;
+	}
       }
     }
   }
@@ -135,7 +203,7 @@ void remove(Node* &treeRoot, Node* current, int value) {
 
 int correctInput() {
   bool leaveLoop = false;
-  cout << "Enter one of the following options: ADD, PRINT, REMOVE, or QUIT (uppercase)" << endl;
+  cout << "Enter one of the following options: ADD, PRINT, SEARCH, REMOVE, or QUIT (uppercase)" << endl;
   while (leaveLoop == false) {
     char input[15];
     cin.get(input, 15);
@@ -146,11 +214,14 @@ int correctInput() {
     else if (strcmp(input, "PRINT") == 0) {
       return 2;
     }
-    else if (strcmp(input, "REMOVE") == 0) {
+    else if (strcmp(input, "SEARCH") == 0) {
       return 3;
     }
-    else if (strcmp(input, "QUIT") == 0) {
+    else if (strcmp(input, "REMOVE") == 0) {
       return 4;
+    }
+    else if (strcmp(input, "QUIT") == 0) {
+      return 5;
     }
     else {
       cout << "Please enter a valid option." << endl;
