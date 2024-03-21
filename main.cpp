@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstring>
+#include <fstream>
 #include "Node.h"
 
 using namespace std;
@@ -29,6 +30,17 @@ int main() {
       bool looping2 = true;
       while (looping2 == true) {
 	if (strcmp(input, "FILE") == 0) {
+	  int input[100];
+	  int totalNums;
+	  cout << "How many numbers are you adding?" << endl;
+	  cin >> totalNums;
+	  cin.get();
+	  ifstream numbers("testNumbers.txt");
+	  for (int i = 0; i < totalNums; i++) {
+	    numbers >> input[i];
+	    Node* newNode = new Node(input[i]);
+	    add(treeRoot, treeRoot, newNode);
+	  }
 	  looping2 = false;
 	}
 	else if (strcmp(input, "CONSOLE") == 0) {
@@ -171,11 +183,49 @@ void remove(Node* &treeRoot, Node* current, Node* parent, int direction, int val
       }
       // Case where node has two children
       else if (current->getRight() != NULL && current->getLeft() != NULL) {
-	
+	Node* replacement = current->getRight();
+	Node* replacementParent = current;
+	while (replacement->getLeft() != NULL) {
+	  replacementParent = replacement;
+	  replacement = replacement->getLeft();
+	}
+	if (current != replacementParent) {
+	  current->setNum(replacement->getNum());
+	  replacementParent->setLeft(NULL);
+	}
+	else {
+	  current->setNum(replacement->getNum());
+	  current->setRight(current->getRight()->getRight());
+	}
       }
       // Case where node has one child
       else if (current->getRight() != NULL || current->getLeft() != NULL) {
-	
+	if (current->getRight() != NULL) {
+	  if (current == treeRoot) {
+	    treeRoot = current->getRight();
+	  }
+	  else {
+	    if (direction == 1) {
+	      parent->setRight(current->getRight());
+	    }
+	    else if (direction == 0) {
+	      parent->setLeft(current->getRight());
+	    }
+	  }
+	}
+	else if (current->getLeft() != NULL) {
+	  if (current == treeRoot) {
+	    treeRoot = current->getLeft();
+	  }
+	  else {
+	    if (direction == 1) {
+	      parent->setRight(current->getLeft());
+	    }
+	    else if (direction == 0) {
+	      parent->setLeft(current->getLeft());
+	    }
+	  }
+	}
       }
     }
     else {
