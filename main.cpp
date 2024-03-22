@@ -29,12 +29,14 @@ int main() {
       cin.ignore(15, '\n');
       bool looping2 = true;
       while (looping2 == true) {
+	// Add numbers through a file
 	if (strcmp(input, "FILE") == 0) {
 	  int input[100];
 	  int totalNums;
 	  cout << "How many numbers are you adding?" << endl;
 	  cin >> totalNums;
 	  cin.get();
+	  // File input
 	  ifstream numbers("testNumbers.txt");
 	  for (int i = 0; i < totalNums; i++) {
 	    numbers >> input[i];
@@ -43,13 +45,14 @@ int main() {
 	  }
 	  looping2 = false;
 	}
+	// Add numbers through the console
 	else if (strcmp(input, "CONSOLE") == 0) {
 	  int input[100];
 	  cout << "How many numbers would you like to add?" << endl;
 	  int totalNums;
 	  cin >> totalNums;
 	  cin.get();
-
+	  // Console input
 	  cout << "Please enter your numbers." << endl;
 	  for (int i = 0; i < totalNums; i++) {
 	    cin >> input[i];
@@ -99,10 +102,12 @@ int main() {
   }
 }
 
+// Add nodes to the tree
 void add(Node* &treeRoot, Node* current, Node* newNode) {
   if (treeRoot == NULL) {
     treeRoot = newNode;
   }
+  // Add to the left
   else if (current->getNum() > newNode->getNum()) {
     if (current->getLeft() == NULL) {
       current->setLeft(newNode);
@@ -111,6 +116,7 @@ void add(Node* &treeRoot, Node* current, Node* newNode) {
       add(treeRoot, current->getLeft(), newNode);
     }
   }
+  // Add to the right
   else if ((current->getNum() < newNode->getNum()) || (current->getNum() == newNode->getNum())) {
     if (current->getRight() == NULL) {
       current->setRight(newNode);
@@ -142,6 +148,7 @@ void print(Node* treeRoot, int level) {
   }
 }
 
+// Search for a value within the tree
 void search(Node* treeRoot, int value, bool &contained) {
   if (treeRoot == NULL) {
     cout << "The tree is empty!" << endl << endl;
@@ -150,15 +157,18 @@ void search(Node* treeRoot, int value, bool &contained) {
     if (treeRoot->getNum() == value) {
       contained = true;
     }
+    // Search through the right branches
     if (treeRoot->getRight() != NULL) {
       search(treeRoot->getRight(), value, contained);
     }
+    // Search through the left branches
     if (treeRoot->getLeft() != NULL) {
       search(treeRoot->getLeft(), value, contained);
     }
   }
 }
 
+// Remove a value within the tree
 void remove(Node* &treeRoot, Node* current, Node* parent, int direction, int value) {
   if (treeRoot == NULL) {
     cout << "The tree is empty!" << endl << endl;
@@ -171,6 +181,7 @@ void remove(Node* &treeRoot, Node* current, Node* parent, int direction, int val
 	if (current == treeRoot) {
 	  treeRoot = NULL;
 	}
+	// Set parent left/right to null
 	else {
 	  if (direction == 1) {
 	    parent->setRight(NULL);
@@ -183,15 +194,22 @@ void remove(Node* &treeRoot, Node* current, Node* parent, int direction, int val
       }
       // Case where node has two children
       else if (current->getRight() != NULL && current->getLeft() != NULL) {
+	// Find the value to replace node
 	Node* replacement = current->getRight();
 	Node* replacementParent = current;
+	// If node's right child has left children, find leftmost child and fix tree
 	while (replacement->getLeft() != NULL) {
 	  replacementParent = replacement;
 	  replacement = replacement->getLeft();
 	}
 	if (current != replacementParent) {
 	  current->setNum(replacement->getNum());
-	  replacementParent->setLeft(NULL);
+	  if (replacement->getRight() != NULL) {
+	    replacementParent->setLeft(replacement->getRight());
+	  }
+	  else {
+	    replacementParent->setLeft(NULL);
+	  }
 	}
 	else {
 	  current->setNum(replacement->getNum());
@@ -200,11 +218,13 @@ void remove(Node* &treeRoot, Node* current, Node* parent, int direction, int val
       }
       // Case where node has one child
       else if (current->getRight() != NULL || current->getLeft() != NULL) {
+	// If child is to the right
 	if (current->getRight() != NULL) {
 	  if (current == treeRoot) {
 	    treeRoot = current->getRight();
 	  }
 	  else {
+	    // Set parent's left/right
 	    if (direction == 1) {
 	      parent->setRight(current->getRight());
 	    }
@@ -213,11 +233,13 @@ void remove(Node* &treeRoot, Node* current, Node* parent, int direction, int val
 	    }
 	  }
 	}
+	// If child is to the left
 	else if (current->getLeft() != NULL) {
 	  if (current == treeRoot) {
 	    treeRoot = current->getLeft();
 	  }
 	  else {
+	    // Set parent's left/right
 	    if (direction == 1) {
 	      parent->setRight(current->getLeft());
 	    }
@@ -229,7 +251,9 @@ void remove(Node* &treeRoot, Node* current, Node* parent, int direction, int val
       }
     }
     else {
+      // Recurse
       if (current->getNum() < value) {
+	// Recursion to the right
 	if (current->getRight() != NULL) {
 	  direction = 1;
 	  remove(treeRoot, current->getRight(), current, direction, value);
@@ -238,6 +262,7 @@ void remove(Node* &treeRoot, Node* current, Node* parent, int direction, int val
 	  cout << endl << "This number is not contained within the tree!" << endl << endl;
 	}
       }
+      // Recursion to the left
       else if (current->getNum() > value) {
 	if (current->getLeft() != NULL) {
 	  direction = 0;
